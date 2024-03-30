@@ -8,15 +8,15 @@ public Plugin myinfo = {
     name = "Detonation",
     author = "Kalbmar",
     description = "A grenade explodes when it hits a player",
-    version = "0.1.0",
+    version = "0.1.1",
     url = "https://github.com/kalbmar/detonation",
 };
 
 public void OnPluginStart() {
-    PluginReaload();
+    PluginReload();
 }
 
-void PluginReaload() {
+void PluginReload() {
     for (int i = 1; i <= MaxClients; i++) {
         if (IsClientConnected(i)) {
             SDKHook(i, SDKHook_TraceAttackPost, Hook_TraceAttackPost);

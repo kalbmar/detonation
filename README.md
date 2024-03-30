@@ -1,6 +1,6 @@
 # Detonation
 
-- A grenade explodes when it hits a player
+A grenade explodes when it hits a player
 
 ### Supported games
 
