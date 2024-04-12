@@ -1,0 +1,14 @@
+"Games"
+{
+	"dod"
+	{
+		"Offsets"
+		{
+			"CBaseGrenade::Detonate()"
+			{
+				"windows"	"225"
+				"linux"		"226"
+			}
+		}
+	}
+}

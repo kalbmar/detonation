@@ -2,26 +2,40 @@
 #include <sdktools>
 #include <sdkhooks>
 
-#define GRENADE_ACTIVATE 2
+#define GAME_CONFIG "grenade-detonation"
+#define GRENADE_DETONATE "CBaseGrenade::Detonate()"
+
+static Handle g_detonate = null;
 
 public Plugin myinfo = {
     name = "Detonation",
     author = "Kalbmar",
     description = "A grenade explodes when it hits a player",
-    version = "0.1.1",
+    version = "1.0.0",
     url = "https://github.com/kalbmar/detonation",
 };
 
 public void OnPluginStart() {
-    PluginReload();
+    Handle gameConfig = LoadGameConfigFile(GAME_CONFIG);
+
+    if (gameConfig != null) {
+        g_detonate = SDKCall_Detonation(gameConfig);
+    }
+
+    delete gameConfig;
 }
 
-void PluginReload() {
-    for (int i = 1; i <= MaxClients; i++) {
-        if (IsClientConnected(i)) {
-            SDKHook(i, SDKHook_TraceAttackPost, Hook_TraceAttackPost);
-        }
+Handle SDKCall_Detonation(Handle gameConfig) {
+    StartPrepSDKCall(SDKCall_Entity);
+    PrepSDKCall_SetFromConf(gameConfig, SDKConf_Virtual, GRENADE_DETONATE);
+
+    Handle call = EndPrepSDKCall();
+
+    if (call == null) {
+        SetFailState("Unable to prepare SDK call for '%s'", GRENADE_DETONATE);
     }
+
+    return call;
 }
 
 public void OnClientPutInServer(int client) {
@@ -33,12 +47,7 @@ void Hook_TraceAttackPost(int victim, int attacker, int inflictor, float damage,
         return;
     }
 
-    if (damagetype != DMG_CRUSH) {
-        return;
-    }
-
-    SetEntProp(inflictor, Prop_Data, "m_takedamage", GRENADE_ACTIVATE);
-    SDKHooks_TakeDamage(inflictor, inflictor, attacker, damage);
+    SDKCall(g_detonate, inflictor);
 }
 
 bool IsClientValid(int client) {
